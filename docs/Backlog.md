@@ -5,10 +5,10 @@
 - [X] **Leitura de Input:** Implementar a função em C (`load_config`) para ler o `.txt` via `fscanf` e popular a struct `SimConfig`.
 
 ## Fase 2: Alocação de Memória e Setup do Device (VRAM)
-- [ ] **Alocação no Host (RAM):** Implementar a função para alocar os arrays contíguos da struct `LatticeSoA` na memória da CPU (usando `malloc` ou `posix_memalign` para alinhamento de cache).
-- [ ] **Alocação no Device (VRAM):** Implementar a função correspondente usando `hipMalloc` para espelhar a `LatticeSoA` na memória da GPU.
-- [ ] **Inicialização do Fluido:** Implementar o kernel de setup inicial (zerar as flutuações $\Delta f_i$, definir densidade base como 1.0 e velocidades como 0.0).
-- [ ] **Lógica de Ping-Pong:** Criar a infraestrutura do loop temporal principal instanciando os dois ponteiros (`lattice_in` e `lattice_out`) e testar a troca de ponteiros (Pointer Swapping) rodando um loop vazio.
+- [X] **Alocação no Host (RAM):** Implementar a função para alocar os arrays contíguos da struct `LatticeSoA` na memória da CPU (usando `malloc` ou `posix_memalign` para alinhamento de cache).
+- [X] **Alocação no Device (VRAM):** Implementar a função correspondente usando `hipMalloc` para espelhar a `LatticeSoA` na memória da GPU.
+- [X] **Inicialização do Fluido:** Implementar o kernel de setup inicial (zerar as flutuações $\Delta f_i$, definir densidade base como 1.0 e velocidades como 0.0).
+- [X] **Lógica de Ping-Pong:** Criar a infraestrutura do loop temporal principal instanciando os dois ponteiros (`lattice_in` e `lattice_out`) e testar a troca de ponteiros (Pointer Swapping) rodando um loop vazio.
 
 ## Fase 3: O Motor Matemático na GPU (Kernels)
 - [ ] **Kernel Principal (Miolo do Fluido):** Implementar o kernel fundido de Colisão + Propagação rodando estritamente para as coordenadas internas ($1$ a $nx-2$, $1$ a $ny-2$). Utilizar a abordagem _Pull (Gather)_ para ler os 9 vizinhos e gravar o resultado de forma coalescida.
