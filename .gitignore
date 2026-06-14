@@ -1,0 +1,9 @@
+build/
+
+CMakeFiles/
+CMakeCache.txt
+CMakeUserPresets.json
+*.cmake
+*.a
+*.o
+*.so
