@@ -1,5 +1,7 @@
 #include "config.h"
 #include "types.h"
+#include "memory.h"
+#include "lbm_kernels.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,6 +41,38 @@ int main(int argc, char* argv[])
                   fprintf(stderr,"[CRITICAL ERROR] Unknown status code detected.\n");
                   return 1;
       }
+
+      LatticeSoA mesh_a;
+      LatticeSoA mesh_b;
+
+      MemoryStatus status_a = allocate_host_lattice(&mesh_a, config.nx, config.ny);
+      if (status_a != MEM_SUCCESS) return 1;
+
+      MemoryStatus status_b = allocate_host_lattice(&mesh_b, config.nx, config.ny);
+      if (status_b != MEM_SUCCESS)
+      {
+            free_host_lattice(&mesh_a);
+            return 1;
+      }
+
+      init_fluid(&mesh_a, config.nx, config.ny);
+      LBM_Context context;
+      context.config = config;
+      context.lattice_in = &mesh_a;
+      context.lattice_out = &mesh_b;
+      context.memory_size = (config.nx * config.ny) * sizeof(real_t) * 12;;
+
+      for (int i = 0; i < config.max_iters; i++)
+      {
+            /*
+            */
+            LatticeSoA *temp;
+            temp = context.lattice_in;
+            context.lattice_in = context.lattice_out;
+            context.lattice_out = temp;
+      }
+      free_host_lattice(&mesh_a);
+      free_host_lattice(&mesh_b);
 
       return 0;
 }
