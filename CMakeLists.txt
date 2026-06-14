@@ -15,14 +15,16 @@ include_directories(
     "${ROCM_PATH}/include"
 )
 
-set(SOURCES
-    src/main.c
+set(CORE_SOURCES
     src/config.c
     src/memory.c
     src/io.c
     src/lbm_kernels.c
 )
 
-add_library(lbm_simulator_core STATIC ${SOURCES})
-
+add_library(lbm_simulator_core STATIC ${CORE_SOURCES})
 target_compile_options(lbm_simulator_core PRIVATE -Wall -Wextra)
+
+add_executable(lbm_simulator src/main.c)
+target_link_libraries(lbm_simulator PRIVATE lbm_simulator_core)
+target_compile_options(lbm_simulator PRIVATE -Wall -Wextra)

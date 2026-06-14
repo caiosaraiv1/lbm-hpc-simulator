@@ -1,0 +1,15 @@
+# ====================================================================
+# LBM HPC Simulator - Configurações da Simulação 
+# ====================================================================
+
+# Dimensões da Malha (Grid Size)
+nx = 256
+ny = 256
+
+# Parâmetros de Tempo
+max_iters = 10000
+save_interval = 1000
+
+# Parâmetros Físicos do Fluido
+omega = 1.85
+u_lid = 0.10
