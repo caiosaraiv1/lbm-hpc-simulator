@@ -15,5 +15,6 @@ MemoryStatus allocate_host_lattice(LatticeSoA *lattice, int nx, int ny);
 void free_host_lattice(LatticeSoA *lattice);
 MemoryStatus allocate_device_lattice(LatticeSoA *lattice, int nx, int ny);
 void free_device_lattice(LatticeSoA *lattice);
+void copy_device_to_host(LatticeSoA *host, LatticeSoA *device, int nx, int ny);
 
 #endif

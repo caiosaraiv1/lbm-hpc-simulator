@@ -11,10 +11,10 @@
 - [X] **Lógica de Ping-Pong:** Criar a infraestrutura do loop temporal principal instanciando os dois ponteiros (`lattice_in` e `lattice_out`) e testar a troca de ponteiros (Pointer Swapping) rodando um loop vazio.
 
 ## Fase 3: O Motor Matemático na GPU (Kernels)
-- [ ] **Kernel Principal (Miolo do Fluido):** Implementar o kernel fundido de Colisão + Propagação rodando estritamente para as coordenadas internas ($1$ a $nx-2$, $1$ a $ny-2$). Utilizar a abordagem _Pull (Gather)_ para ler os 9 vizinhos e gravar o resultado de forma coalescida.
-- [ ] **Kernel de Contorno - Paredes Estáticas:** Implementar o kernel separado para tratar o _Bounce-Back_ (rebatimento) nas paredes esquerda, direita e inferior.
-- [ ] **Kernel de Contorno - Tampa Móvel (Lid):** Implementar o kernel dedicado à parede superior, injetando a velocidade macroscópica da tampa (`u_lid`) nas distribuições.
-- [ ] **Sincronização Host-Device:** Implementar a cópia dos dados (`hipMemcpy` com flag `hipMemcpyDeviceToHost`) da GPU para a CPU apenas quando for o momento de salvar/exportar dados, evitando gargalos no loop principal.
+- [X] **Kernel Principal (Miolo do Fluido):** Implementar o kernel fundido de Colisão + Propagação rodando estritamente para as coordenadas internas ($1$ a $nx-2$, $1$ a $ny-2$). Utilizar a abordagem _Pull (Gather)_ para ler os 9 vizinhos e gravar o resultado de forma coalescida.
+- [X] **Kernel de Contorno - Paredes Estáticas:** Implementar o kernel separado para tratar o _Bounce-Back_ (rebatimento) nas paredes esquerda, direita e inferior.
+- [X] **Kernel de Contorno - Tampa Móvel (Lid):** Implementar o kernel dedicado à parede superior, injetando a velocidade macroscópica da tampa (`u_lid`) nas distribuições.
+- [X] **Sincronização Host-Device:** Implementar a cópia dos dados (`hipMemcpy` com flag `hipMemcpyDeviceToHost`) da GPU para a CPU apenas quando for o momento de salvar/exportar dados, evitando gargalos no loop principal.
 
 ## Fase 4: Exportação de Dados e Validação Visual
 - [ ] **Cálculo Macroscópico:** Implementar a função (ou kernel) que reduz os valores de $\Delta f_i$ para encontrar a flutuação da densidade ($\Delta \rho$) e o campo de velocidade ($u_x, u_y$) em cada nó.

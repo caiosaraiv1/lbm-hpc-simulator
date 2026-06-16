@@ -60,12 +60,19 @@ int main(int argc, char* argv[])
       context.config = config;
       context.lattice_in = &mesh_a;
       context.lattice_out = &mesh_b;
-      context.memory_size = (config.nx * config.ny) * sizeof(real_t) * 12;;
+      context.memory_size = (config.nx * config.ny) * sizeof(real_t) * 12;
 
       for (int i = 0; i < config.max_iters; i++)
       {
-            /*
-            */
+            collide_stream_cpu(&context);
+            bounce_back_boundaries(&context);
+
+            if (i % config.save_interval == 0)
+            {
+                  printf("I = %d\n", i);
+                  // copy_device_to_host();
+            }
+
             LatticeSoA *temp;
             temp = context.lattice_in;
             context.lattice_in = context.lattice_out;

@@ -88,3 +88,16 @@ void free_device_lattice(LatticeSoA *lattice)
       lattice->u_x = NULL;
       lattice->u_y = NULL;
 }
+
+void copy_device_to_host(LatticeSoA *host, LatticeSoA *device, int nx, int ny)
+{
+      size_t total_bytes = (nx * ny) * sizeof(real_t);
+
+      for (int i = 0; i < Q; i++)
+      {
+            hipMemcpy(host->df[i], device->df[i], total_bytes, hipMemcpyDeviceToHost);
+      }
+      hipMemcpy(host->d_rho, device->d_rho, total_bytes, hipMemcpyDeviceToHost);
+      hipMemcpy(host->u_x, device->u_x, total_bytes, hipMemcpyDeviceToHost);
+      hipMemcpy(host->u_y, device->u_y, total_bytes, hipMemcpyDeviceToHost);
+}
