@@ -7,6 +7,12 @@ static const real_t w[Q] = {
       (real_t)(1.0 / 36.0), (real_t)(1.0 / 36.0), (real_t)(1.0 / 36.0), (real_t)(1.0 / 36.0)
 };
 
+// Deslocamentos no eixo X para as direções de 0 a 8
+static const int cx[Q] = { 0,  1,  0, -1,  0,  1, -1, -1,  1 };
+
+// Deslocamentos no eixo Y para as direções de 0 a 8
+static const int cy[Q] = { 0,  0,  1,  0, -1,  1,  1, -1, -1 };
+
 void init_fluid(LatticeSoA *host, int nx, int ny)
 {
       size_t total_cells = (size_t) nx * ny;
@@ -25,12 +31,6 @@ void init_fluid(LatticeSoA *host, int nx, int ny)
 
 void collide_stream_cpu(LBM_Context *ctx)
 {
-      // Deslocamentos no eixo X para as direções de 0 a 8
-      const int cx[Q] = { 0,  1,  0, -1,  0,  1, -1, -1,  1 };
-
-      // Deslocamentos no eixo Y para as direções de 0 a 8
-      const int cy[Q] = { 0,  0,  1,  0, -1,  1,  1, -1, -1 };
-
       size_t nx = ctx->config.nx;
       size_t ny = ctx->config.ny;
       real_t omega = ctx->config.omega;
@@ -155,3 +155,43 @@ void bounce_back_boundaries(LBM_Context *ctx)
       }
 }
 
+void compute_macroscopic_cpu(LBM_Context *ctx)
+{
+      size_t nx = ctx->config.nx;
+      size_t ny = ctx->config.ny;
+
+      LatticeSoA *out = ctx->lattice_out;
+
+      for (size_t y = 0; y < ny; y++)
+      {
+            for (size_t x = 0; x < nx; x++)
+            {
+                  real_t rho = 0.0;
+                  real_t u_x = 0.0;
+                  real_t u_y = 0.0;
+
+                  size_t idx = (y * nx) + x;
+
+                  for (int j = 0; j < Q; j++)
+                  {
+                        rho += out->df[j][idx];
+                        u_x += out->df[j][idx] * cx[j];
+                        u_y += out->df[j][idx] * cy[j];
+                  }
+                  if (rho > 0.0)
+                  {
+                        u_x = u_x / rho;
+                        u_y = u_y / rho;
+                  }
+                  else
+                  {
+                        u_x = 0.0;
+                        u_y = 0.0;
+                  }
+
+                  out->d_rho[idx] = rho;
+                  out->u_x[idx] = u_x;
+                  out->u_y[idx] = u_y;
+            }
+      }
+}

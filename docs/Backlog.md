@@ -17,8 +17,8 @@
 - [X] **Sincronização Host-Device:** Implementar a cópia dos dados (`hipMemcpy` com flag `hipMemcpyDeviceToHost`) da GPU para a CPU apenas quando for o momento de salvar/exportar dados, evitando gargalos no loop principal.
 
 ## Fase 4: Exportação de Dados e Validação Visual
-- [ ] **Cálculo Macroscópico:** Implementar a função (ou kernel) que reduz os valores de $\Delta f_i$ para encontrar a flutuação da densidade ($\Delta \rho$) e o campo de velocidade ($u_x, u_y$) em cada nó.
-- [ ] **Exportador VTK:** Escrever a função `export_vtk` que formata a malha macroscópica em um arquivo ASCII `.vtk` legível pelo ParaView (utilizando `fprintf`).
+- [X] **Cálculo Macroscópico:** Implementar a função (ou kernel) que reduz os valores de $\Delta f_i$ para encontrar a flutuação da densidade ($\Delta \rho$) e o campo de velocidade ($u_x, u_y$) em cada nó.
+- [X] **Exportador VTK:** Escrever a função `export_vtk` que formata a malha macroscópica em um arquivo ASCII `.vtk` legível pelo ParaView (utilizando `fprintf`).
 - [ ] **Integração do Loop Principal:** Amarrar os kernels da Fase 3 e o exportador da Fase 4 dentro do `while (t < max_iters)`, controlando a chamada do VTK através da variável `save_interval`.
 - [ ] **Primeiro Teste de Fumaça:** Rodar a simulação, abrir o `.vtk` gerado no ParaView e validar se o redemoinho clássico do _Lid-driven cavity_ está se formando corretamente.
 

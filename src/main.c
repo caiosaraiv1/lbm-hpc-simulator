@@ -2,6 +2,7 @@
 #include "types.h"
 #include "memory.h"
 #include "lbm_kernels.h"
+#include "io.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -56,6 +57,7 @@ int main(int argc, char* argv[])
       }
 
       init_fluid(&mesh_a, config.nx, config.ny);
+      init_fluid(&mesh_b, config.nx, config.ny);
       LBM_Context context;
       context.config = config;
       context.lattice_in = &mesh_a;
@@ -69,8 +71,7 @@ int main(int argc, char* argv[])
 
             if (i % config.save_interval == 0)
             {
-                  printf("I = %d\n", i);
-                  // copy_device_to_host();
+                  export_vtk(&context, i);
             }
 
             LatticeSoA *temp;

@@ -7,3 +7,5 @@ CMakeUserPresets.json
 *.a
 *.o
 *.so
+
+*.vtk
