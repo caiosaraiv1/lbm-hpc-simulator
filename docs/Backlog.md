@@ -19,8 +19,8 @@
 ## Fase 4: Exportação de Dados e Validação Visual
 - [X] **Cálculo Macroscópico:** Implementar a função (ou kernel) que reduz os valores de $\Delta f_i$ para encontrar a flutuação da densidade ($\Delta \rho$) e o campo de velocidade ($u_x, u_y$) em cada nó.
 - [X] **Exportador VTK:** Escrever a função `export_vtk` que formata a malha macroscópica em um arquivo ASCII `.vtk` legível pelo ParaView (utilizando `fprintf`).
-- [ ] **Integração do Loop Principal:** Amarrar os kernels da Fase 3 e o exportador da Fase 4 dentro do `while (t < max_iters)`, controlando a chamada do VTK através da variável `save_interval`.
-- [ ] **Primeiro Teste de Fumaça:** Rodar a simulação, abrir o `.vtk` gerado no ParaView e validar se o redemoinho clássico do _Lid-driven cavity_ está se formando corretamente.
+- [X] **Integração do Loop Principal:** Amarrar os kernels da Fase 3 e o exportador da Fase 4 dentro do `while (t < max_iters)`, controlando a chamada do VTK através da variável `save_interval`.
+- [X] **Primeiro Teste de Fumaça:** Rodar a simulação, abrir o `.vtk` gerado no ParaView e validar se o redemoinho clássico do _Lid-driven cavity_ está se formando corretamente.
 
 ## Fase 5: Tolerância a Falhas e HPC Profiling
 - [ ] **Sistema de Checkpointing (Save):** Implementar a escrita do estado binário completo do `LatticeSoA` (as 9 direções) no disco a cada $X$ milhares de iterações.

@@ -71,6 +71,7 @@ int main(int argc, char* argv[])
 
             if (i % config.save_interval == 0)
             {
+                  compute_macroscopic_cpu(&context);
                   export_vtk(&context, i);
             }
 

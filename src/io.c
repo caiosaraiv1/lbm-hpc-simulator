@@ -45,7 +45,7 @@ void export_vtk(LBM_Context *ctx, int step)
             for (size_t x = 0; x < nx; x++)
             {
                   size_t idx = (y * nx) + x;
-                  fprintf(archive, "%f %f 0.0\n", ctx->lattice_out->u_x[idx], ctx->lattice_out->u_y[idx]);
+                  fprintf(archive, "%f %f %f\n", ctx->lattice_out->u_x[idx], ctx->lattice_out->u_y[idx], (real_t)0.0);
             }
       }
 
