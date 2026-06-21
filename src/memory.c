@@ -3,6 +3,10 @@
 #include <stdlib.h>
 #include <hip/hip_runtime_api.h>
 
+#ifdef _WIN32
+#include <malloc.h>
+#endif
+
 MemoryStatus allocate_host_lattice(LatticeSoA *lattice, int nx, int ny)
 {
       if (lattice == NULL || nx <= 0 || ny <= 0)
@@ -12,11 +16,19 @@ MemoryStatus allocate_host_lattice(LatticeSoA *lattice, int nx, int ny)
       int error = 0;
 
       for (int i = 0; i < Q; i++)
-            error = error || posix_memalign((void**)&(lattice->df[i]), 64, total_bytes);
+      {
+            lattice->df[i] = (real_t*)_aligned_malloc(total_bytes, 64);
+            if (lattice->df[i] == NULL) error = 1;
+      }
 
-      error = error || posix_memalign((void**)&(lattice->d_rho), 64, total_bytes);
-      error = error || posix_memalign((void**)&(lattice->u_x), 64, total_bytes);
-      error = error || posix_memalign((void**)&(lattice->u_y), 64, total_bytes);
+      lattice->d_rho = (real_t*)_aligned_malloc(total_bytes, 64);
+      if (lattice->d_rho == NULL) error = 1;
+
+      lattice->u_x = (real_t*)_aligned_malloc(total_bytes, 64);
+      if (lattice->u_x == NULL) error = 1;
+
+      lattice->u_y = (real_t*)_aligned_malloc(total_bytes, 64);
+      if (lattice->u_y == NULL) error = 1;
 
       if (error != 0)
       {
@@ -33,13 +45,13 @@ void free_host_lattice(LatticeSoA *lattice)
 
       for (int i = 0; i < Q; i++)
       {
-            free(lattice->df[i]);
+            _aligned_free(lattice->df[i]);
             lattice->df[i] = NULL;
       }
 
-      free(lattice->d_rho);
-      free(lattice->u_x);
-      free(lattice->u_y);
+      _aligned_free(lattice->d_rho);
+      _aligned_free(lattice->u_x);
+      _aligned_free(lattice->u_y);
 
       lattice->d_rho = NULL;
       lattice->u_x = NULL;

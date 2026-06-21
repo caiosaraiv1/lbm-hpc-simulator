@@ -1,6 +1,10 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "types.h"
 
 typedef enum
@@ -11,5 +15,9 @@ typedef enum
 } ConfigStatus;
 
 ConfigStatus load_config(const char* file_path, SimConfig* config);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

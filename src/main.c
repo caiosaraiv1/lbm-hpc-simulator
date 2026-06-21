@@ -6,6 +6,34 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <hip/hip_runtime.h>
+#include <direct.h>
+
+int setup_lattices(const SimConfig *config, LatticeSoA *mesh_host, LatticeSoA *mesh_a, LatticeSoA *mesh_b)
+{
+      MemoryStatus status;
+
+      status = allocate_host_lattice(mesh_host, config->nx, config->ny);
+      if (status != MEM_SUCCESS)
+            goto err_host;
+
+      status = allocate_device_lattice(mesh_a, config->nx, config->ny);
+      if (status != MEM_SUCCESS)
+            goto err_a;
+
+      status = allocate_device_lattice(mesh_b, config->nx, config->ny);
+      if (status != MEM_SUCCESS)
+            goto err_b;
+
+      return 0;
+
+err_b:
+      free_device_lattice(mesh_a);
+err_a:
+      free_host_lattice(mesh_host);
+err_host:
+      return 1;
+}
 
 int main(int argc, char* argv[])
 {
@@ -15,7 +43,7 @@ int main(int argc, char* argv[])
             return 1;
       }
 
-      SimConfig config = {0};
+      SimConfig config = {};
       ConfigStatus status = load_config(argv[1], &config);
 
       switch (status)
@@ -43,36 +71,64 @@ int main(int argc, char* argv[])
                   return 1;
       }
 
-      LatticeSoA mesh_a;
-      LatticeSoA mesh_b;
+      LatticeSoA mesh_host;   // RAM para VTK
+      LatticeSoA mesh_a;      // VRAM
+      LatticeSoA mesh_b;      // VRAM
 
-      MemoryStatus status_a = allocate_host_lattice(&mesh_a, config.nx, config.ny);
-      if (status_a != MEM_SUCCESS) return 1;
-
-      MemoryStatus status_b = allocate_host_lattice(&mesh_b, config.nx, config.ny);
-      if (status_b != MEM_SUCCESS)
+      int mem_status = setup_lattices(&config, &mesh_host, &mesh_a, &mesh_b);
+      if (mem_status != 0)
       {
-            free_host_lattice(&mesh_a);
+            fprintf(stderr,"[ERROR] Problem with Lattice Setup.\n");
             return 1;
       }
 
-      init_fluid(&mesh_a, config.nx, config.ny);
-      init_fluid(&mesh_b, config.nx, config.ny);
+      char output_dir[256];
+      sprintf(output_dir, "data/output/sim_%.0f_%.0f_%d",
+            config.omega * 10,
+            config.u_lid * 1000,
+            config.max_iters);
+      _mkdir(output_dir);
+
       LBM_Context context;
       context.config = config;
       context.lattice_in = &mesh_a;
       context.lattice_out = &mesh_b;
       context.memory_size = (config.nx * config.ny) * sizeof(real_t) * 12;
 
+      dim3 threads(16, 16);
+      dim3 blocks((config.nx + 15) / 16, (config.ny + 15) / 16);
+
+      init_fluid_gpu<<<blocks, threads>>>(*context.lattice_in, config.nx, config.ny);
+      init_fluid_gpu<<<blocks, threads>>>(*context.lattice_out, config.nx, config.ny);
+
       for (int i = 0; i < config.max_iters; i++)
       {
-            collide_stream_cpu(&context);
-            bounce_back_boundaries(&context);
+            collide_stream_gpu<<<blocks, threads>>>(*context.lattice_in, *context.lattice_out, config.nx, config.ny, config.omega);
+            bounce_back_boundaries_gpu<<<blocks, threads>>>(*context.lattice_in, *context.lattice_out, config.nx, config.ny, config.u_lid);
 
             if (i % config.save_interval == 0)
             {
-                  compute_macroscopic_cpu(&context);
-                  export_vtk(&context, i);
+                  hipDeviceSynchronize();
+                  copy_device_to_host(&mesh_host, context.lattice_out, config.nx, config.ny);
+
+                  LBM_Context host_ctx = context;
+                  host_ctx.lattice_out = &mesh_host;
+
+                  export_vtk(output_dir, &host_ctx, i);
+
+                  double progress = (double)i / config.max_iters * 100.0;
+                  printf("\r[PROGRESS] [");
+
+                  int bar_width = 20;
+                  int pos = (progress / 100.0) * bar_width;
+                  for (int j = 0; j < bar_width; ++j)
+                  {
+                        if (j < pos) printf("=");
+                        else if (j == pos) printf(">");
+                        else printf(" ");
+                  }
+                  printf("] %.1f%% (%d/%d)", progress, i, config.max_iters);
+                  fflush(stdout);
             }
 
             LatticeSoA *temp;
@@ -80,8 +136,16 @@ int main(int argc, char* argv[])
             context.lattice_in = context.lattice_out;
             context.lattice_out = temp;
       }
-      free_host_lattice(&mesh_a);
-      free_host_lattice(&mesh_b);
+
+      printf("\r[PROGRESS] [====================] 100.0%% (%d/%d)\n",
+      config.max_iters, config.max_iters);
+      fflush(stdout);
+
+      printf("[SUCCESS] Simulation completed successfully!\n");
+
+      free_host_lattice(&mesh_host);
+      free_device_lattice(&mesh_a);
+      free_device_lattice(&mesh_b);
 
       return 0;
 }

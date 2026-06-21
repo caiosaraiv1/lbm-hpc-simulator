@@ -23,7 +23,5 @@
 - [X] **Primeiro Teste de Fumaça:** Rodar a simulação, abrir o `.vtk` gerado no ParaView e validar se o redemoinho clássico do _Lid-driven cavity_ está se formando corretamente.
 
 ## Fase 5: Tolerância a Falhas e HPC Profiling
-- [ ] **Sistema de Checkpointing (Save):** Implementar a escrita do estado binário completo do `LatticeSoA` (as 9 direções) no disco a cada $X$ milhares de iterações.
-- [ ] **Sistema de Recovery (Load):** Alterar a inicialização do programa para checar se existe um arquivo de checkpoint válido; se sim, carregar via `hipMemcpyHostToDevice` e continuar do passo temporal salvo em vez de reiniciar do zero.
-- [ ] **Aceleração de Pré/Pós Processamento:** Injetar diretivas `#pragma omp parallel for` nas funções de leitura/gravação da CPU para acelerar a manipulação de arrays no Host antes de enviá-los ou após recebê-los da GPU.
-- [ ] **Profiling com `rocprof`:** Rodar a ferramenta de análise da AMD para verificar a ocupação dos _Wavefronts_ e confirmar se as leituras/escritas da GPU estão operando em regime 100% coalescido.
+- [x] **Portabilidade dos Kernels (O Setup da GPU):** Antes de fazer o Checkpoint, nós vamos criar os kernels `__global__` na GPU. O loop do `main.c` vai parar de chamar as funções CPU e passará a disparar threads na VRAM.
+- [X] **Profiling com `rocprof`:** Rodar a ferramenta de análise da AMD para verificar a ocupação dos _Wavefronts_ e confirmar se as leituras/escritas da GPU estão operando em regime 100% coalescido.

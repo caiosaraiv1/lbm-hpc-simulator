@@ -1,6 +1,10 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define Q 9
 
 #include <stddef.h>
@@ -38,5 +42,9 @@ typedef struct
       LatticeSoA *lattice_out;
       size_t memory_size;
 } LBM_Context;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
